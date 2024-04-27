@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mark.springboot.mapper.CategoryMapper">
+    <insert id="insert">
+        INSERT INTO product_category(categoryname,shopID) values(#{categoryname},#{shopID})
+    </insert>
+    <update id="update">
+        Update product_category
+        <set>
+            <if test="categoryname!=null">
+                categoryname=#{categoryname},
+            </if>
+            <if test="shopID!=null">
+                shopID=#{shopID}
+            </if>
+        </set>
+        <where>
+            categoryID=#{categoryID}
+        </where>
+    </update>
+    <delete id="delete">
+        delete from product_category where categoryID=#{categoryID}
+    </delete>
+    <delete id="deleteBatch">
+        DELETE FROM product_category
+        WHERE categoryID IN
+        <foreach collection="categoryIds" item="categoryId" open="(" separator="," close=")">
+            #{categoryId}
+        </foreach>
+    </delete>
+    <select id="findCategoryByShopID" resultType="com.mark.springboot.entity.Product_category">
+        select * from product_category where shopID=#{shopID}
+    </select>
+    <select id="findCategoryByCategoryName" resultType="com.mark.springboot.entity.Product_category">
+        select * from product_category where shopID=#{shopID} and categoryname like #{categoryname}
+    </select>
+    <select id="findCategoryNameByID" resultType="java.lang.String">
+        select categoryname from product_category where categoryID=#{categoryID}
+    </select>
+</mapper>

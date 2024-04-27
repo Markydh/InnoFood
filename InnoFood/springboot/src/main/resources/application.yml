@@ -1,0 +1,34 @@
+#设置端口为9091
+server:
+  port: 9091
+#数据库连接
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/InnoFood?serverTimezone=GMT%2b8
+    username: root
+    password: root
+    #设置全局，Null值不返回到前端
+  jackson:
+    default-property-inclusion: non_null
+    #设置全局,上传文件可以达到10M
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+
+mybatis:
+  mapper-locations: classpath:mappers/*.xml #扫描所有的mybatis的xml文件
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+
+files:
+  upload:
+    path: /Users/dianhongyang/Downloads/InnoFood/InnoFood/files
+
+
+
+

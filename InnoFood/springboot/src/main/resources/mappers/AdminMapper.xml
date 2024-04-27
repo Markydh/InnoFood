@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mark.springboot.mapper.AdminMapper">
+    <insert id="insert">
+        Insert Into admin(username, password) values (#{username}, #{password})
+    </insert>
+    <delete id="deleteByID">
+        delete from admin where AdminID=#{id}
+    </delete>
+    <select id="findAll" resultType="com.mark.springboot.entity.Admin">
+        select * from admin
+    </select>
+    <select id="login" resultType="com.mark.springboot.entity.Admin">
+        select * from admin where username=#{username} and password=#{password}
+    </select>
+    <select id="findAdminByPage" resultType="com.mark.springboot.entity.Admin">
+        select * from admin where username like #{username} order by AdminID desc limit #{pageNum},#{pageSize}
+    </select>
+    <select id="findTotal" resultType="java.lang.Integer">
+        select count(*) from admin where username like #{username}
+    </select>
+    <select id="findAdminByID" resultType="com.mark.springboot.entity.Admin">
+        select * from admin where AdminID=#{adminID}
+    </select>
+    <update id="update">
+    Update admin
+    <set>
+        <if test="username!=null">
+            username=#{username},
+        </if>
+        <if test="password!=null">
+            password=#{password},
+        </if>
+        <if test="psrc!=null">
+            psrc=#{psrc}
+        </if>
+    </set>
+    <where>
+        AdminID=#{AdminID}
+    </where>
+    </update>
+</mapper>

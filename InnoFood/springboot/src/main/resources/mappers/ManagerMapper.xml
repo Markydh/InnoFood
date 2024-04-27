@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mark.springboot.mapper.ManagerMapper">
+    <!--    查询商家信息-->
+    <select id="findAll" resultType="com.mark.springboot.entity.Manager">
+        select * from manager
+    </select>
+    <select id="login" resultType="com.mark.springboot.entity.Manager">
+        select * from manager where username=#{username} and password=#{password}
+    </select>
+    <select id="findManagerByID" resultType="com.mark.springboot.entity.Manager">
+        select * from manager where managerID=#{managerID}
+    </select>
+    <select id="findManagerByUsername" resultType="com.mark.springboot.entity.Manager">
+        select * from manager where username=#{username}
+    </select>
+    <select id="findManagerByPage" resultType="com.mark.springboot.entity.Manager">
+        select * from manager where username like #{username} and email like #{email} order by managerID desc limit #{pageNum},#{pageSize}
+    </select>
+    <select id="findTotal" resultType="java.lang.Integer">
+        select count(*) from manager where username like #{username} and email like #{email}
+    </select>
+    <select id="findTotalPriceByManagerId" resultType="java.lang.Integer">
+        SELECT
+            sum( o.total_price ) totalPrice
+        FROM
+            `manager` m,
+            `order` o,
+            `shop` s
+        WHERE
+                    s.shopID = o.shopID
+                AND s.managerID = m.managerID
+                AND s.managerID = #{managerID}
+                AND YEAR ( o.create_time ) = YEAR ( CURRENT_DATE )
+          AND MONTH ( o.create_time ) = MONTH ( CURRENT_DATE );
+    </select>
+    <select id="findShopTotalByManagerId" resultType="com.mark.springboot.Dto.ManagerShopPriceDTO">
+        SELECT
+            s.shopID,
+            s.shopName AS shopName,
+            SUM(o.total_price) AS totalPrice
+        FROM
+            `shop` s
+                JOIN
+            `order` o ON s.shopID = o.shopID
+                JOIN
+            `manager` m ON s.managerID = m.managerID
+        WHERE
+                    m.managerID = #{managerID}
+                AND YEAR(o.create_time) = YEAR(CURRENT_DATE)
+          AND MONTH(o.create_time) = MONTH(CURRENT_DATE)
+        GROUP BY
+            s.shopID, s.shopName;
+    </select>
+    <select id="findShopOrders" resultType="com.mark.springboot.Dto.EveryShopOrderDTO">
+        SELECT
+            s.shopID as order_shopID,
+            s.shopName as order_shopName,
+            COUNT(o.orderID) AS monthly_orders
+        FROM
+            `order` o
+                JOIN
+            shop s ON o.shopID = s.shopID
+        WHERE
+                    s.managerID = #{managerID}
+                AND YEAR(o.create_time) = YEAR(CURRENT_DATE)
+          AND MONTH(o.create_time) = MONTH(CURRENT_DATE)
+        GROUP BY
+            s.shopID, s.shopName;
+    </select>
+
+
+    <!--    新增商家信息-->
+    <insert id="insert">
+        insert into manager(username,password,nickname,email,phone) values(#{username},#{password},#{nickname},#{email},#{phone})
+    </insert>
+    <!--    更新商家信息-->
+    <update id="update">
+        Update manager
+        <set>
+            <if test="username!=null">
+                username=#{username},
+            </if>
+            <if test="password!=null">
+                password=#{password},
+            </if>
+            <if test="nickname!=null">
+                nickname=#{nickname},
+            </if>
+            <if test="email!=null">
+                email=#{email},
+            </if>
+            <if test="phone!=null">
+                phone=#{phone},
+            </if>
+            <if test="state!=null">
+                state=#{state},
+            </if>
+            <if test="psrc!=null">
+                psrc=#{psrc}
+            </if>
+        </set>
+        <where>
+            managerID=#{managerID}
+        </where>
+    </update>
+    <update id="managerFrost">
+        Update manager
+        <set>
+            <if test="username!=null">
+                username=#{username},
+            </if>
+            <if test="password!=null">
+                password=#{password},
+            </if>
+            <if test="nickname!=null">
+                nickname=#{nickname},
+            </if>
+            <if test="email!=null">
+                email=#{email},
+            </if>
+            <if test="phone!=null">
+                phone=#{phone},
+            </if>
+            <if test="state!=null">
+                state=1,
+            </if>
+            <if test="psrc!=null">
+                psrc=#{psrc}
+            </if>
+        </set>
+        <where>
+            managerID=#{managerID}
+        </where>
+    </update>
+    <update id="managerThaw">
+        Update manager
+        <set>
+            <if test="username!=null">
+                username=#{username},
+            </if>
+            <if test="password!=null">
+                password=#{password},
+            </if>
+            <if test="nickname!=null">
+                nickname=#{nickname},
+            </if>
+            <if test="email!=null">
+                email=#{email},
+            </if>
+            <if test="phone!=null">
+                phone=#{phone},
+            </if>
+            <if test="state!=null">
+                state=0,
+            </if>
+            <if test="psrc!=null">
+                psrc=#{psrc}
+            </if>
+        </set>
+        <where>
+            managerID=#{managerID}
+        </where>
+    </update>
+</mapper>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mark.springboot.mapper.OrderMapper">
+    <insert id="insertOrder" parameterType="com.mark.springboot.entity.Order" useGeneratedKeys="true" keyProperty="orderID">
+        INSERT INTO `order` (userID,shopID,good_total,delivery_price,total_price) values (#{userID},#{shopID},#{good_total},#{delivery_price},#{total_price})
+    </insert>
+    <insert id="insertOrderDetail">
+        INSERT INTO order_detail(orderID,productID,productname,quantity,price) values (#{orderID},#{productID},#{productname},#{quantity},#{price})
+    </insert>
+    <update id="updateOrderStateTo1">
+        update `order` set order_state=1,order_time = now() where orderID=#{orderID}
+    </update>
+    <update id="updateOrderStateTo2">
+        update `order` set order_state=2,pick_time = now(),deliveryID = #{deliveryID} where orderID=#{orderID}
+    </update>
+    <update id="updateOrderStateTo3">
+        update `order` set order_state=3,arrive_time = now() where orderID=#{orderID}
+    </update>
+
+    <select id="findNewOrderByShopID" resultType="com.mark.springboot.entity.Order">
+        select * from `order` where shopID =#{shopID} and order_state=0 order by create_time desc limit #{pageNum},#{pageSize}
+    </select>
+    <select id="findOldOrderByShopID" resultType="com.mark.springboot.entity.Order">
+        select * from `order` where shopID =#{shopID} and order_state !=0 order by order_time desc limit #{pageNum},#{pageSize}
+    </select>
+    <select id="countNewOrderNum" resultType="java.lang.Integer">
+        select count(*) from `order` where shopID =#{shopID} and order_state=0
+    </select>
+    <select id="countOldOrderNum" resultType="java.lang.Integer">
+        select count(*) from `order` where shopID =#{shopID} and order_state >= 1
+    </select>
+    <select id="findOrderDetailByOrderID" resultType="com.mark.springboot.entity.OrderDetail">
+        select * from order_detail where orderID=#{orderID}
+    </select>
+    <select id="findDoneOrderByShopID" resultType="com.mark.springboot.entity.Order">
+        select * from `order` where shopID =#{shopID} and order_state=3  order by arrive_time desc
+    </select>
+    <select id="findDeliveryToPickOrder" resultType="com.mark.springboot.entity.Order">
+        select * from `order` where order_state=1 order by order_time desc limit #{pageNum},#{pageSize}
+    </select>
+    <select id="countAllDeliveryToPickOrder" resultType="java.lang.Integer">
+        select count(*) from `order` where order_state=1
+    </select>
+    <select id="findDeliveryDoneOrder" resultType="com.mark.springboot.Dto.OrderDto">
+        select * from `order` where order_state > 1 and deliveryID=#{deliveryID} order by arrive_time desc limit #{pageNum},#{pageSize}
+    </select>
+    <select id="countDeliveryDoneOrder" resultType="java.lang.Integer">
+        select count(*) from `order` where order_state > 1  and deliveryID=#{deliveryID}
+    </select>
+    <select id="findOrderByOrderID" resultType="com.mark.springboot.entity.Order">
+        select * from `order` where orderID=#{orderID}
+    </select>
+    <select id="findOrderByPage" resultType="com.mark.springboot.entity.Order">
+        select * from `order`
+        where userID = #{userID}
+        <if test="orderState != null">
+            and order_state=#{orderState}
+        </if>
+        <if test="orderState == null">
+            and order_state is not null
+        </if>
+        order by orderID desc
+        limit #{pageNum},#{pageSize}
+
+    </select>
+    <select id="findTotal" resultType="java.lang.Integer">
+        select count(*) from `order` where userID = #{userID}
+        <if test="orderState != null">
+            and order_state=#{orderState}
+        </if>
+        <if test="orderState == null">
+            and order_state is not null
+        </if>
+
+    </select>
+    <select id="findDetailByOrderId" resultType="com.mark.springboot.entity.OrderDetail">
+        select * from `order_detail` where orderID = #{orderID}
+    </select>
+    <select id="getCountByUserId" resultType="java.lang.Integer">
+        select count(*) from `order` where userID = #{userID} and order_state=#{order_state}
+    </select>
+    <select id="getMoney" resultType="java.lang.Integer">
+        select sum(total_price) from `order` where userID = #{userID}
+    </select>
+    <select id="getMonthMoney" resultType="com.mark.springboot.Dto.MonthMoneyDTO">
+        <![CDATA[
+        SELECT
+            MONTH(create_time) AS month1,
+            YEAR(create_time) AS year,
+            SUM(total_price) AS totalSpent
+        FROM
+            `order`
+        WHERE
+            userID = #{userID}
+        GROUP BY
+            year, month1
+        ORDER BY
+            year asc, month1 asc;
+        ]]>
+    </select>
+</mapper>

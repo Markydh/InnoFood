@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mark.springboot.mapper.ShopMapper">
+    <insert id="insert">
+        INSERT into shop(managerID,shopName,psrc,description,address,shopTypeID) VALUES(#{managerID},#{shopName},#{psrc},#{description},#{address},#{shopTypeID})
+    </insert>
+
+    <update id="update">
+        UPDATE shop
+        <set>
+            <if test="managerID!=null">
+                managerID=#{managerID},
+            </if>
+            <if test="shopName!=null">
+                shopName=#{shopName},
+            </if>
+            <if test="psrc!=null">
+                psrc=#{psrc},
+            </if>
+            <if test="description!=null">
+                description=#{description},
+            </if>
+            <if test="address!=null">
+                address=#{address},
+            </if>
+            <if test="star!=null">
+                star=#{star},
+            </if>
+            <if test="shopTypeID!=null">
+                shopTypeID=#{shopTypeID},
+            </if>
+            <if test="state!=null">
+                state=#{state}
+            </if>
+        </set>
+        <where>
+            shopID=#{shopID}
+        </where>
+    </update>
+    <delete id="delete">
+        delete from shop where shopID=#{shopID}
+    </delete>
+    <delete id="deleteShopByShopType">
+        DELETE  from shop where shopTypeID=#{id}
+    </delete>
+    <select id="findAll" resultType="com.mark.springboot.entity.Shop">
+        select * from shop
+    </select>
+    <select id="findShopByShopNameAndManagerID" resultType="com.mark.springboot.entity.Shop">
+        select * from shop where shopName like #{shopName} and managerID =#{managerID}
+    </select>
+    <select id="findShopByManagerID" resultType="com.mark.springboot.entity.Shop">
+        select * from shop where managerID =#{managerID}
+    </select>
+    <select id="findShopByShopID" resultType="com.mark.springboot.entity.Shop">
+        select * from shop where shopID=#{shopID}
+    </select>
+    <select id="guess" resultType="com.mark.springboot.entity.Shop">
+        SELECT t.shopID, t.managerID, t.shopName, t.psrc, t.description, t.address, t.star, t.state, t.shopTypeID
+        FROM (
+                 SELECT s.shopID, s.managerID, s.shopName, s.psrc, s.description, s.address, s.star, s.state, s.shopTypeID, IFNULL(COUNT(o.orderID), 0) as order_count
+                 FROM shop s
+                          LEFT JOIN `order` o ON s.shopID = o.shopID AND o.userID = #{userID}
+                 GROUP BY s.shopID
+                 ORDER BY order_count DESC
+                     LIMIT 4
+             ) t
+    </select>
+    <select id="productMonthlySales" resultType="com.mark.springboot.Dto.ProductMonthlySalesDTO">
+        SELECT
+            od.productID,
+            p.productname AS product_name,
+            YEAR(o.order_time) AS order_year,
+            MONTH(o.order_time) AS order_month,
+            SUM(od.quantity) AS monthly_sales
+        FROM
+            `order` o
+            JOIN
+            `order_detail` od ON o.orderID = od.orderID
+            JOIN
+            `product` p ON od.productID = p.productID
+        WHERE
+            o.order_state = 3 -- 筛选已完成的订单
+          and o.shopID = #{shopID}
+
+        GROUP BY
+            od.productID, order_year, order_month
+        ORDER BY
+            order_year asc, order_month asc, monthly_sales asc;
+    </select>
+    <select id="productCategorySales" resultType="com.mark.springboot.Dto.ProductCategorySalesDTO">
+        SELECT
+            pc.categoryname AS category_name,
+            SUM(od.quantity) AS category_sales
+        FROM
+            product_category pc
+                JOIN
+            product p ON pc.categoryID = p.categoryID
+                JOIN
+            order_detail od ON p.productID = od.productID
+                JOIN
+            `order` o ON od.orderID = o.orderID
+        WHERE
+            o.shopID = #{shopID}
+          AND o.create_time >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
+        GROUP BY
+            pc.categoryID, pc.categoryname;
+    </select>
+    <select id="getShopTotalMoney" resultType="java.lang.Double">
+        SELECT
+            SUM(o.total_price) AS total_revenue
+        FROM
+            `order` o
+        WHERE
+                    o.shopID = #{shopID}
+                AND YEAR(o.create_time) = YEAR(CURRENT_DATE)
+          AND MONTH(o.create_time) = MONTH(CURRENT_DATE);
+    </select>
+    <select id="getShopMonthlySales" resultType="com.mark.springboot.Dto.ShopMonthlySalesDTO">
+        SELECT
+            YEAR(o.create_time) AS shop_year,
+            MONTH(o.create_time) AS shop_month,
+            SUM(o.total_price) AS shop_sales
+        FROM
+            `order` o
+        WHERE
+            o.shopID = #{shopID}
+          AND YEAR(o.create_time) = YEAR(CURRENT_DATE)
+        GROUP BY
+            shop_year, shop_month
+        ORDER BY
+            shop_year, shop_month;
+    </select>
+
+</mapper>

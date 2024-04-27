@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mark.springboot.mapper.DeliveryMapper">
+
+    <insert id="insert">
+        INSERT into delivery(username,password,phone,email) VALUES(#{username},#{password},#{phone},#{email})
+    </insert>
+    <update id="update">
+        Update delivery
+        <set>
+            <if test="username!=null">
+                username=#{username},
+            </if>
+            <if test="password!=null">
+                password=#{password},
+            </if>
+            <if test="phone!=null">
+                phone=#{phone},
+            </if>
+            <if test="email!=null">
+                email=#{email},
+            </if>
+            <if test="psrc!=null">
+                psrc=#{psrc},
+            </if>
+            <if test="score!=null">
+                score=#{score}
+            </if>
+        </set>
+        <where>
+            deliveryID=#{deliveryID}
+        </where>
+    </update>
+    <delete id="deleteByID" parameterType="Integer">
+        delete from delivery where deliveryID=#{id}
+    </delete>
+    <select id="findDeliveryByUsername" resultType="com.mark.springboot.entity.Delivery">
+        select * from delivery where username like #{username}
+    </select>
+    <select id="login" resultType="com.mark.springboot.entity.Delivery">
+        select * from delivery where username like #{username} and password like #{password}
+    </select>
+    <select id="findDeliveryByPage" resultType="com.mark.springboot.entity.Delivery">
+        SELECT * FROM delivery WHERE username LIKE #{username} AND phone LIKE #{phone} ORDER BY deliveryID DESC LIMIT #{pageNum},#{pageSize}
+    </select>
+    <select id="findTotal" resultType="java.lang.Integer">
+        select count(*) from delivery where username like #{username} and phone like #{phone}
+    </select>
+    <select id="findDeliveryByID" resultType="com.mark.springboot.entity.Delivery">
+        select * from delivery where deliveryID=#{deliveryID}
+    </select>
+    <select id="findMonthlyOrders" resultType="com.mark.springboot.Dto.DeliveryOrdersDTO">
+        SELECT
+            YEAR(o.pick_time) AS order_year,
+            MONTH(o.pick_time) AS order_month,
+            COUNT(o.orderID) AS monthly_order
+        FROM
+            `order` o
+        WHERE
+            o.deliveryID = #{deliveryID}
+          AND YEAR(o.pick_time) = YEAR(CURRENT_DATE)
+        GROUP BY
+            order_year, order_month
+        ORDER BY
+            order_year, order_month;
+    </select>
+    <select id="findMonthlyOrder" resultType="java.lang.Integer">
+        SELECT
+            COUNT(o.orderID) AS monthly_delivery_orders
+        FROM
+            `order` o
+        WHERE
+                    o.deliveryID = #{deliveryID}
+                AND YEAR(o.pick_time) = YEAR(CURRENT_DATE)
+          AND MONTH(o.pick_time) = MONTH(CURRENT_DATE);
+    </select>
+    <select id="findDeliveryByDeliveryID" resultType="com.mark.springboot.entity.Delivery">
+        select * from delivery where deliveryID=#{deliveryID}
+    </select>
+</mapper>

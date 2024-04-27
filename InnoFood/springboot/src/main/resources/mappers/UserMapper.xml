@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mark.springboot.mapper.UserMapper">
+    <select id="findAll" resultType="com.mark.springboot.entity.User">
+        SELECT * FROM user
+    </select>
+    <select id="findUserByPage" resultType="com.mark.springboot.entity.User">
+        select * from user where username like #{username} and email like #{email} and address like #{address} order by UserID desc limit #{pageNum},#{pageSize}
+    </select>
+    <select id="findTotal" resultType="java.lang.Integer">
+        select count(*) from user where username like #{username} and email like #{email} and address like #{address}
+    </select>
+    <select id="login" resultType="com.mark.springboot.entity.User">
+        select * from user where username like #{username} and password like #{password}
+    </select>
+    <select id="findUserByUsername" resultType="com.mark.springboot.entity.User">
+        select * from user where username like #{username}
+    </select>
+    <select id="findUserByID" resultType="com.mark.springboot.entity.User">
+        select * from user where userID=#{userID}
+    </select>
+    <insert id="insert">
+        INSERT into user(username,password,nickname,email,phone,address) VALUES(#{username},#{password},#{nickname},#{email},#{phone},#{address})
+    </insert>
+    <update id="update">
+        Update user
+        <set>
+            <if test="username!=null">
+                username=#{username},
+            </if>
+            <if test="password!=null">
+                password=#{password},
+            </if>
+            <if test="nickname!=null">
+                nickname=#{nickname},
+            </if>
+            <if test="email!=null">
+                email=#{email},
+            </if>
+            <if test="phone!=null">
+                phone=#{phone},
+            </if>
+            <if test="address!=null">
+                address=#{address},
+            </if>
+            <if test="score!=null">
+                score=#{score},
+            </if>
+            <if test="psrc!=null">
+                psrc=#{psrc},
+            </if>
+            <if test="state!=null">
+                state=#{state}
+            </if>
+        </set>
+        <where>
+            userID=#{userID}
+        </where>
+    </update>
+    <delete id="deleteById" parameterType="Integer">
+        delete from user where userID=#{id}
+    </delete>
+</mapper>

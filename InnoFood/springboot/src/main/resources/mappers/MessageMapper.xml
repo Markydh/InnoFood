@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mark.springboot.mapper.MessageMapper">
+    <insert id="insert">
+        INSERT INTO message(userID,shopID,orderID,deliveryID,msgContent,state) values (#{userID},#{shopID},#{orderID},#{deliveryID},#{msgContent},#{state})
+    </insert>
+    <update id="updateManagerMsg">
+        UPDATE message set state = 1 where messageID=#{messageID}
+    </update>
+    <update id="updateUserMsg">
+        UPDATE message set state = 1 where messageID=#{messageID}
+    </update>
+    <select id="getManagerMsgByShopID" resultType="com.mark.springboot.entity.Message">
+        select * from message where shopID = #{shopID} and state = 0 order by msgTime desc
+    </select>
+    <select id="getNewManagerMsgNumByShopID" resultType="java.lang.Integer">
+        select count(*) from message where shopID= #{shopID} and state = 0 order by msgTime desc
+    </select>
+    <select id="getUserMsgByUserID" resultType="com.mark.springboot.entity.Message">
+        select * from message where userID=#{userID} and state = 2 order by msgTime desc
+    </select>
+</mapper>

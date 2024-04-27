@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mark.springboot.mapper.ShopTypeMapper">
+
+    <insert id="insert">
+        Insert Into shopType(shopTypeName) values (#{shopTypeName})
+    </insert>
+    <delete id="deleteById">
+        Delete from shopType where shopTypeID=#{id};
+    </delete>
+    <update id="update">
+        Update shopType
+        <set>
+            <if test="shopTypeName!=null">
+                shopTypeName=#{shopTypeName}
+            </if>
+        </set>
+        <where>
+            shopTypeID=#{shopTypeID}
+        </where>
+    </update>
+    <select id="findAll" resultType="com.mark.springboot.entity.ShopType">
+        select * from shopType
+    </select>
+    <select id="findShopTypeNameByID" resultType="java.lang.String">
+        select shopTypeName from shopType where shopTypeID=#{shopTypeID}
+    </select>
+</mapper>

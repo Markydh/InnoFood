@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mark.springboot.mapper.FileMapper">
+    <insert id="insert">
+        INSERT into file(name,type,size,psrc) VALUES(#{name},#{type},#{size},#{psrc})
+    </insert>
+    <update id="update">
+        Update file
+        <set>
+            <if test="name!=null">
+                `name`=#{name},
+            </if>
+            <if test="psrc!=null">
+                psrc=#{psrc},
+            </if>
+            <if test="size!=null">
+                `size`=#{size},
+            </if>
+            <if test="type!=null">
+                `type`=#{type},
+            </if>
+            <if test="isDelete!=null">
+                isDelete=#{isDelete},
+            </if>
+            <if test="enable!=null">
+                enable=#{enable},
+            </if>
+        </set>
+        <where>
+            id=#{id}
+        </where>
+    </update>
+    <select id="findbanner" resultType="com.mark.springboot.entity.Files">
+        select * from file where id between 68 and 71;
+    </select>
+</mapper>
