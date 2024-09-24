@@ -4,6 +4,7 @@
 ### Vue
 ### Element-UI
 ### Vuetify
+### Echarts
 ## 数据库：
 ### mysql
 ### redis
